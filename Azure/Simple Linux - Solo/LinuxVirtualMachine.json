@@ -67,7 +67,7 @@
     {
       "apiVersion": "2016-03-30",
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat(variables('vmName'), 'nic')]",
+      "name": "[concat(variables('vmName'), 'pip')]",
       "location": "[resourceGroup().location]",
       "tags": {
         "displayName": "PublicIPAddress"
@@ -109,6 +109,7 @@
         "displayName": "NetworkInterface"
       },
       "dependsOn": [
+        "[[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), 'pip'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
       ],
       "properties": {
@@ -118,7 +119,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), 'nic'))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), 'pip'))]"
               },
               "subnet": {
                 "id": "[variables('subnetRef')]"
