@@ -109,7 +109,7 @@
         "displayName": "NetworkInterface"
       },
       "dependsOn": [
-        "[[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), 'pip'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('vmName'), 'pip'))]",
         "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
       ],
       "properties": {
