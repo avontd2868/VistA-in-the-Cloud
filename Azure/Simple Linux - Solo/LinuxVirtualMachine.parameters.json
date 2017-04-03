@@ -4,9 +4,6 @@
   "parameters": {
     "adminUsername": {
       "value": null
-    },
-    "dnsNameForPublicIP": {
-      "value": null
     }
   }
 }
