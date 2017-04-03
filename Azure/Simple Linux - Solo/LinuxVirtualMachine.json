@@ -191,10 +191,10 @@
             "typeHandlerVersion": "1.4",
             "autoUpgradeMinorVersion": true,
             "settings": {
+              "commandToExecute": "sh custScript.sh",
               "fileUris": [
-                "[concat(parameters('_artifactsLocation'), '/', variables('custScriptScriptFolder'), '/', variables('custScriptScriptFileName'), parameters('_artifactsLocationSasToken'))]"
-              ],
-              "commandToExecute": "[concat('sh ', variables('custScriptScriptFileName'))]"
+                "https://raw.githubusercontent.com/OSEHRA/VistA-in-the-Cloud/master/Azure/Simple%20Linux%20-%20Solo/custScript.sh"
+              ]
             }
           }
         }
