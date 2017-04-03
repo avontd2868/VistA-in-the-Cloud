@@ -46,7 +46,15 @@ Shut down always – I don’t want this VM online, ever |0:00 -> 23:59:59
 
 ## Azure Templates
 
-The following templates will deploy the specified version of CentOS (6.x, 7.x) and execute a bash script.  The first template deploys into a new environment with no existing infrastructure.  The second deploys into a pre-existing infrastructure where you might already have done some work, but need to bring more systems online.  Please start with the first to get familiar, and then move to the second if needed.
+The following templates will deploy the specified version of CentOS (6.x, 7.x) and execute a bash script.  The first template deploys a single virtual machine  The second deploys virtual machines at scale.  Please start with the first to get familiar, and then move to the second if needed.
 
-*  Template One :  Work in progress (Coming soon)
+*  Template One :  [Simple Linux - Solo](https://github.com/OSEHRA/VistA-in-the-Cloud/tree/master/Azure/Simple%20Linux%20-%20Solo)
 *  Template Two :  Work in progress (Coming soon)
+
+## Azure Resource Manager - Learning Templates
+
+The following links will be of benifit when begining development of Azure Resource Manager (ARM) templates.
+
+* [Azure Resource Manager Documentation](https://docs.microsoft.com/en-us/azure/azure-resource-manager/)
+* [Azure Resource Manager - Create your first ARM template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-create-first-template)
+* [Azure Resource Manager - Deploy Multiple Instances of a Resource](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-multiple)
