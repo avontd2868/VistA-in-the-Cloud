@@ -9,7 +9,7 @@
 *.sln
 *.ps1
 *.deployproj
-*.deployproj
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -244,3 +244,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+*.targets
