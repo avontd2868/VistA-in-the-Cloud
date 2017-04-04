@@ -64,7 +64,7 @@
     "vhdStorageType": "Standard_LRS",
     "publicIPAddressType": "Dynamic",
     "vhdStorageContainerName": "vhds",
-    "virtualNetworkName": "[concat(parameters('vmNamePrefix'), 'vnet')",
+    "virtualNetworkName": "[concat(parameters('vmNamePrefix'), 'vnet')]",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
     "vhdStorageAccountName": "[concat('vhdstor', uniqueString(resourceGroup().id))]",
