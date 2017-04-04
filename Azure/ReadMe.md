@@ -48,8 +48,8 @@ Shut down always – I don’t want this VM online, ever |0:00 -> 23:59:59
 
 The following templates will deploy the specified version of CentOS (6.x, 7.x) and execute a bash script.  The first template deploys a single virtual machine.  The second deploys virtual machines(multi) at scale.  Please start with the first to get familiar, and then move to the second as needed.
 
-*  Template One :  [Simple Linux - Solo](https://github.com/OSEHRA/VistA-in-the-Cloud/tree/master/Azure/Simple%20Linux%20-%20Solo)
-*  Template Two :  Work in progress (Coming soon)
+*  Example Template One :  [Simple Linux - Solo](https://github.com/OSEHRA/VistA-in-the-Cloud/tree/master/Azure/Simple%20Linux%20-%20Solo)
+*  Example Template Two :  [Simple Linux - Multi](https://github.com/OSEHRA/VistA-in-the-Cloud/tree/master/Azure/Simple%20Linux%20-%20Multi)
 
 ## Azure Resource Manager - Learning Templates
 
