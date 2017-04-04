@@ -67,7 +67,7 @@
     "virtualNetworkName": "[concat(parameters('vmNamePrefix'), 'vnet')]",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "vhdStorageAccountName": "[concat('vhdstor', uniqueString(resourceGroup().id))]",
+    "vhdStorageAccountName": "[concat('vhdstor', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
