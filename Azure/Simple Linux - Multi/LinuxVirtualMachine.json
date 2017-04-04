@@ -1,0 +1,267 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "minLength": 1,
+      "metadata": {
+        "description": "User name for the Virtual Machine."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the Virtual Machine."
+      }
+    },
+    "vmNamePrefix": {
+      "type": "string",
+      "maxLength": 8,
+      "metadata": {
+        "Description": "This value will be utilized to name resources during deployment.  Must be 8 or less characters."
+      }
+    },
+    "numInstances": {
+      "type": "int",
+      "defaultValue": 2,
+      "maxValue": 40,
+      "metadata": {
+        "Description": "The number of virtual machine instances to deploy. Maximum allowed value is 40"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D1_v2",
+      "allowedValues": [
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D12_v2",
+        "Standard_D13_v2"
+      ]
+    },
+    "CentOSVersion": {
+      "type": "string",
+      "defaultValue": "7.3",
+      "allowedValues": [
+        "6.7",
+        "6.8",
+        "7.2",
+        "7.3"
+      ],
+      "metadata": {
+        "description": "The CentOS version for the VM. This will pick a fully patched image of this given CentOS version."
+      }
+    }
+  },
+  "variables": {
+    "imagePublisher": "OpenLogic",
+    "imageOffer": "CentOS",
+    "addressPrefix": "10.0.0.0/24",
+    "subnetName": "Subnet",
+    "subnetPrefix": "10.0.0.0/24",
+    "vhdStorageType": "Standard_LRS",
+    "publicIPAddressType": "Dynamic",
+    "vhdStorageContainerName": "vhds",
+    "virtualNetworkName": "[concat(parameters('vmNamePrefix'), 'vnet')",
+    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+    "vhdStorageAccountName": "[concat('vhdstor', uniqueString(resourceGroup().id))]",
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('vhdStorageAccountName')]",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "StorageAccount"
+      },
+      "sku": {
+        "name": "[variables('vhdStorageType')]"
+      },
+      "kind": "Storage"
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[concat(parameters('vmNamePrefix'),'nsg')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NSG"
+      },
+      "properties": {
+        "securityRules": [
+          {
+            "name": "ssh-rule",
+            "properties": {
+              "description": "Allow SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "Internet",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[concat(parameters('vmNamePrefix'), 'pip', copyIndex())]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "PublicIPAddress"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
+      },
+      "copy": {
+        "name": "pipcopy",
+        "count": "[parameters('numInstances')]"
+      }
+    },
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "VirtualNetwork"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('vmNamePrefix'),'nsg'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2016-03-30",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('vmNamePrefix'), 'nic', copyIndex())]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "NetworkInterface"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), 'pip', copyIndex()))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+      ],
+      "copy": {
+        "name": "nicCopy",
+        "count": "[parameters('numInstances')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('vmNamePrefix'), 'pip', copyIndex()))]"
+              },
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('vmNamePrefix'), copyIndex())]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "VirtualMachine"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('vhdStorageAccountName'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNamePrefix'), 'nic', copyIndex()))]"
+      ],
+      "copy": {
+        "name": "vmCopy",
+        "count": "[parameters('numInstances')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('vmNamePrefix'), copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[parameters('CentOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('vhdStorageAccountName')), '2016-01-01').primaryEndpoints.blob, variables('vhdStorageContainerName'), '/', parameters('vmNamePrefix'),copyIndex(), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmNamePrefix'), 'nic', copyIndex()))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "custScript",
+          "type": "extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2016-03-30",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('vmNamePrefix'), copyIndex()))]"
+          ],
+          "tags": {
+            "displayName": "custScript"
+          },
+          "properties": {
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "CustomScriptForLinux",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "commandToExecute": "sh custScript.sh",
+              "fileUris": [
+                "https://raw.githubusercontent.com/OSEHRA/VistA-in-the-Cloud/master/Azure/Simple%20Linux%20-%20Multi/custScript.sh"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
