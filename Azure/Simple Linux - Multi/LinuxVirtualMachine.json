@@ -151,7 +151,10 @@
             }
           }
         ]
-      }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('vmNamePrefix'),'nsg'))]"
+      ] 
     },
 
     {
