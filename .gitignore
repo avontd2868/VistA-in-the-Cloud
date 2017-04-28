@@ -245,3 +245,4 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 *.targets
+Azure/Documents - Shortcut.lnk
